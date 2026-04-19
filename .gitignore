@@ -1,0 +1,36 @@
+# Sub-repos (each has its own git)
+backend/
+website/
+mobile/
+
+# Binaries
+*.exe
+*.dll
+*.so
+*.dylib
+bin/
+/PaymentChecker
+
+# Test & coverage
+*.test
+*.out
+coverage.*
+
+# Go workspace
+go.work
+go.work.sum
+
+# Env & secrets
+.env
+.env.*
+!.env.example
+
+# IDE
+.idea/
+.vscode/
+*.swp
+.DS_Store
+
+# Local data
+*.db
+data/
