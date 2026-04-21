@@ -16,7 +16,7 @@ Development on this monorepo is assisted by a set of Claude AI agents, each scop
 |-------|-------|---------------|
 | **orchestrator** | Cross-package coordination | Multi-package features; sequences work across specialists |
 | **architector** | Design and planning | Complex tasks spanning >1 package, new API patterns, breaking changes |
-| **shared-agent** | `shared/` API contracts | Any change to schemas, types, or constants — must run BEFORE backend/clients |
+| **shared-agent** | `shared/` — contracts + wiki | API changes (runs BEFORE clients); also activated AFTER significant work to log decisions and update wiki |
 | **backend-agent** | `backend/` | Go code: handlers, storage, scheduler, tests |
 | **web-agent** | `website/` | Web frontend: components, pages, API integration |
 | **mobile-agent** | `mobile/` | Mobile app: screens, navigation, platform code |
@@ -25,7 +25,7 @@ Development on this monorepo is assisted by a set of Claude AI agents, each scop
 ## Delegation Rules
 
 - Never write code in **orchestrator** — it only coordinates specialists
-- **shared-agent** always runs first when an API contract is changing
+- **shared-agent** runs first when an API contract is changing, and runs last after any significant work to log decisions and update the wiki
 - **reviewer-agent** is mandatory after every code change, no exceptions
 - For a backend-only bug: invoke **backend-agent** directly (no orchestrator needed)
 - For a UI change with no API impact: invoke **web-agent** or **mobile-agent** directly

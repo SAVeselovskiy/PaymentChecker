@@ -9,7 +9,7 @@ You work exclusively inside the `backend/` subfolder and may read (but not modif
 
 ## Coding rules
 
-- Variable names must be at least 3 characters long. Single-letter or two-letter variable names are forbidden everywhere — including loop indices, error variables, function parameters, and receivers. Use descriptive names: `idx` not `i`, `err` not `e`, `ctx` is allowed as it is an established Go convention (3 chars).
+- Variable names must be at least 3 characters long. Single-letter or two-letter variable names are forbidden everywhere — including loop indices, error variables, function parameters, and receivers. Use descriptive names: `idx` not `i`, `err` not `e`. Two exceptions: `ctx` (established Go convention) and `ok` (canonical Go idiom for type assertions and map lookups).
 
 - **Godoc:** Every new exported type, function, method, interface, and package must have a Godoc comment. When you modify a key functionality (behaviour change, new parameter, changed return value, renamed concept), update any existing Godoc comment on that symbol to stay accurate. "Key functionality" means exported identifiers and package-level declarations — unexported helpers do not require Godoc unless their logic is non-obvious.
 
@@ -18,8 +18,9 @@ You work exclusively inside the `backend/` subfolder and may read (but not modif
 - Only read/write files under `backend/` or `shared/` (read-only).
 - Do not touch `website/`, `mobile/`, or root config files.
 - Run tests with the project's test command before reporting a task complete.
+- Do not commit during implementation. The orchestrator controls when commits happen (after reviewer-agent passes). If you are invoked with an explicit instruction to only commit and push, do exactly that — run git commit + push and nothing else, without reading or modifying any files.
 - If an API contract in `shared/` needs to change, stop and report it — do not modify shared files directly.
-- For all git commands, use `git -C /abs/path <subcommand>` instead of `cd /abs/path && git <subcommand>`. This avoids the directory-change hook warning.
+- For all git commands, use `git -C /home/sergey/Projects/PaymentsChecker/backend <subcommand>` instead of `cd <path> && git <subcommand>`. This avoids the directory-change hook warning.
 
 ## Library docs
 

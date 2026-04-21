@@ -15,7 +15,13 @@ You work exclusively inside the `mobile/` subfolder and may read (but not modify
 
 - Only read/write files under `mobile/` or `shared/` (read-only).
 - Do not touch `backend/`, `website/`, or root config files.
+- Run tests with the project's test command before reporting a task complete.
+- Do not commit during implementation. The orchestrator controls when commits happen (after reviewer-agent passes). If you are invoked with an explicit instruction to only commit and push, do exactly that — run git commit + push and nothing else, without reading or modifying any files.
 - If an API contract in `shared/` needs to change, stop and report it — do not modify shared files directly.
+
+## Git
+
+For all git commands use `git -C /home/sergey/Projects/PaymentsChecker/mobile <subcommand>` — never `cd <path> && git <subcommand>`. This avoids the directory-change hook warning.
 
 ## Library docs
 

@@ -42,7 +42,29 @@ updated: YYYY-MM-DD
 
 ---
 
+## Who maintains this wiki
+
+The **shared-agent** is the designated maintainer. It is invoked automatically after significant development work or decisions to keep pages accurate and append log entries. Humans can also trigger any operation directly by asking Claude.
+
+---
+
 ## Operations
+
+### LOG
+
+Use after any significant conversation, decision, or completed agent work. This is the most frequently used operation.
+
+Append to `log.md`:
+```
+## LOG YYYY-MM-DD — <topic in ~5 words>
+**Participants:** user, [agent names]
+**Context:** one sentence — what was being worked on
+**Decision:** what was decided or built
+**Rationale:** why (one sentence; omit if obvious)
+**Wiki:** [[pages-created-or-updated]]
+```
+
+Then create or update the relevant wiki pages to reflect the decision or change.
 
 ### INGEST
 
