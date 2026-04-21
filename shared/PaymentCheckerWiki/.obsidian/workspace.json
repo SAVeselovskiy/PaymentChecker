@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Welcome.md",
+                "file": "CLAUDE.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Welcome"
+              "title": "CLAUDE"
             }
           }
         ]
@@ -31,10 +31,14 @@
             "id": "c64266187b13473d",
             "type": "leaf",
             "state": {
-              "type": "graph",
-              "state": {},
-              "icon": "lucide-git-fork",
-              "title": "Graph view"
+              "type": "markdown",
+              "state": {
+                "file": "index.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "index"
             }
           }
         ]
@@ -199,8 +203,24 @@
       "bases:Create new base": false
     }
   },
-  "active": "e27745eb58fe589d",
+  "active": "c64266187b13473d",
   "lastOpenFiles": [
+    "pages/backend/storage.md",
+    "pages/backend/scheduler.md",
+    "pages/backend/parsing.md",
+    "pages/backend/handlers.md",
+    "pages/backend/backend-overview.md",
+    "pages/architecture/monorepo-structure.md",
+    "pages/architecture/agent-system.md",
+    "CLAUDE.md",
+    "Development Guide.md",
+    "Deployment.md",
+    "Database Schema.md",
+    "Configuration.md",
+    "Project Structure.md",
+    "index.md",
+    "Architecture.md",
+    "log.md",
     "Welcome.md"
   ]
 }
