@@ -19,7 +19,7 @@ Append-only chronological record of all wiki operations.
 **Decision:** Single Go binary serves both `/api/*` and the embedded static frontend. Shared OpenAPI v0.1.1 contract; `@paymentchecker/types` via pnpm workspace.
 **Rationale:** Aligns with the project's minimalist single-VPS philosophy; reuses Telegram identity for auth.
 **Wiki:** [[adr-004-http-api-and-telegram-login]], [[adr-005-static-export-embedded-in-go]], [[roadmap-overview]] updated, [[index.md]] updated.
-**Commits:** backend `8a5616c`, frontend `5b211ba`, shared (initial contract) `e170c45`, shared (this commit) `<this commit>`.
+**Commits:** backend `8a5616c`, frontend `5b211ba`, shared (initial contract) `e170c45`, shared (this commit) `16eb27d`.
 
 ---
 
