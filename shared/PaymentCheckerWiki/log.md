@@ -13,6 +13,16 @@ Append-only chronological record of all wiki operations.
 
 ---
 
+## LOG 2026-04-25 — Web vertical slice shipped
+**Participants:** user, orchestrator, architector (plan only), shared-agent, backend-agent, web-agent, reviewer-agent
+**Context:** Added the first cross-package feature: HTTP API + Telegram Login Widget auth + Next.js web frontend.
+**Decision:** Single Go binary serves both `/api/*` and the embedded static frontend. Shared OpenAPI v0.1.1 contract; `@paymentchecker/types` via pnpm workspace.
+**Rationale:** Aligns with the project's minimalist single-VPS philosophy; reuses Telegram identity for auth.
+**Wiki:** [[adr-004-http-api-and-telegram-login]], [[adr-005-static-export-embedded-in-go]], [[roadmap-overview]] updated, [[index.md]] updated.
+**Commits:** backend `8a5616c`, frontend `5b211ba`, shared (initial contract) `e170c45`, shared (this commit) `<this commit>`.
+
+---
+
 ## INGEST 2026-04-21 — Initial wiki creation
 
 - Source: codebase exploration of `/home/sergey/Projects/PaymentsChecker`

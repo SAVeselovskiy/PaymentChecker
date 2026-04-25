@@ -2,63 +2,83 @@
 title: Roadmap Overview
 category: roadmap
 tags: [roadmap, planned, website, mobile, api]
-related: [[overview]], [[monorepo-structure]], [[agent-system]]
-updated: 2026-04-21
+related: [[overview]], [[monorepo-structure]], [[agent-system]], [[adr-004-http-api-and-telegram-login]], [[adr-005-static-export-embedded-in-go]]
+updated: 2026-04-25
 ---
 
 # Roadmap Overview
 
-The backend Telegram bot is production-ready. The planned next phases are a web frontend, a mobile app, and the HTTP API layer that connects them.
+The backend Telegram bot is production-ready. The first cross-package vertical slice has shipped: HTTP API + Telegram Login Widget auth + Next.js web frontend. Mobile remains TBD.
 
-## Planned Components
+## Component Status
 
 ### 1. HTTP API (Backend Extension)
 
-Before website or mobile can be built, the backend needs to expose an HTTP API.
+**Status: Vertical slice shipped (partial).**
 
-- Currently: bot talks only to Telegram (no HTTP endpoints)
-- Needed: REST or GraphQL API for querying spendings, adding entries, managing account
-- API contracts will live in `shared/api/` (OpenAPI specs or Protobuf)
-- The [[agent-system]] requires `shared-agent` to define contracts before `backend-agent` implements them
+The backend now exposes an HTTP server alongside the Telegram bot in the same Go process (see [[adr-004-http-api-and-telegram-login]]). The following endpoints are implemented and covered by the OpenAPI 0.1.1 contract in `shared/api/openapi.yaml`:
 
-> [!note] Not yet started
-> No API design work has been done. This is the prerequisite for everything below.
+| Endpoint | Status |
+|----------|--------|
+| `POST /api/auth/telegram` | Implemented |
+| `POST /api/auth/logout` | Implemented |
+| `GET /api/me` | Implemented |
+| `GET /api/spendings/today` | Implemented |
+| `POST /api/spendings` (add spending) | Not yet implemented |
+| `PUT /api/spendings/{id}` (edit) | Not yet implemented |
+| `DELETE /api/spendings/{id}` (delete) | Not yet implemented |
+| `GET /api/spendings/week` | Not yet implemented |
+| `GET /api/spendings/month` | Not yet implemented |
+| `GET /api/spendings/year` | Not yet implemented |
 
-### 2. Website (`website/`)
+The contract lives in `shared/api/` and is versioned; downstream packages consume `@paymentchecker/types` from the pnpm workspace.
 
-A web frontend for visualizing and managing spendings.
+### 2. Website (`PaymentChecker-frontend/`)
 
-- Current state: placeholder (`README.md` only, no code)
-- Planned: charts/graphs, category breakdown, date filters, spending history
-- Stack: TBD (likely React/Next.js based on project conventions)
-- Will consume the HTTP API once built
+**Status: Vertical slice shipped.**
 
-### 3. Mobile App (`mobile/`)
+- Stack: Next.js 15 App Router + TypeScript + Tailwind CSS + Recharts + TanStack Query
+- Deploy model: `output: 'export'` static build, embedded in the Go binary via `//go:embed` (see [[adr-005-static-export-embedded-in-go]])
+- Shipped pages:
+  - `/login` — Telegram Login Widget, redirects to `/` on success
+  - `/` — today's spending breakdown by category (bar chart + list)
+- Auth: client-side `<AuthGate>` component checks `/api/me`; unauthenticated users are redirected to `/login`
+- Future: history view, week/month/year charts, settings page, add-spending UI
 
-iOS and Android app for on-the-go spending entry and review.
+### 3. Mobile App (`PaymentChecker-mobile/`)
 
 - Current state: placeholder (`README.md` only, no code)
 - Planned: mirrors website features; native platform feel
 - Stack: TBD (React Native or Flutter likely)
 - Will consume the same HTTP API as the website
 
+> [!note] Not yet started
+> No mobile design or implementation work has been done.
+
 ### 4. Shared Contracts (`shared/`)
 
-- `shared/api/` — OpenAPI specs or Protobuf for the HTTP API
-- `shared/types/` — TypeScript types or JSON Schema for frontend use
-- `shared/constants/` — shared enums (categories, currencies, etc.)
+- `shared/api/openapi.yaml` — OpenAPI 3.1 spec (current: v0.1.1)
+- `shared/types/api.ts` — TypeScript types, generated from the spec
+- `shared/types/package.json` — `@paymentchecker/types` workspace package
+- Future: add spending mutation endpoints; consider Protobuf for mobile
 
 ## Development Order
 
 ```
-HTTP API design (shared-agent)
+HTTP API design (shared-agent)        ✓ done (v0.1.1)
     └─ Backend HTTP API (backend-agent)
-        ├─ Website (web-agent)
-        └─ Mobile app (mobile-agent)
+        ├─ Auth + today endpoints     ✓ done (vertical slice)
+        └─ CRUD + history endpoints   ← next
+    └─ Website (web-agent)
+        ├─ Login + today view         ✓ done (vertical slice)
+        └─ History, charts, settings  ← next
+    └─ Mobile app (mobile-agent)      ← TBD
 ```
 
 ## Related Pages
 
 - [[monorepo-structure]] — current package layout
 - [[agent-system]] — how agents handle cross-cutting features
-- [[overview]] — current system (bot-only)
+- [[overview]] — current system architecture
+- [[adr-004-http-api-and-telegram-login]] — HTTP API and auth decisions
+- [[adr-005-static-export-embedded-in-go]] — frontend deployment model

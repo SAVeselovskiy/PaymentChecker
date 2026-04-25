@@ -107,7 +107,7 @@ components:
         Fields forwarded from the Telegram Login Widget callback.
         The `hash` field is an HMAC-SHA256 of the sorted field list signed
         with the bot token; the backend MUST verify it and reject payloads
-        where `auth_date` is older than 1 hour.
+        where `auth_date` is older than 24 hours.
       required:
         - id
         - first_name
@@ -195,11 +195,12 @@ paths:
             Set-Cookie:
               required: true
               description: >
-                `session=<jwt>; HttpOnly; Secure; SameSite=Lax; Path=/`
+                Sets a `session` cookie containing the signed JWT.
+                Lifetime: 7 days (`Max-Age=604800`).
               schema:
                 type: string
                 examples:
-                  - session=eyJ...; HttpOnly; Secure; SameSite=Lax; Path=/
+                  - session=eyJ...; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=604800
           content:
             application/json:
               schema:

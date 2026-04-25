@@ -1,5 +1,11 @@
 # Shared Contract Changelog
 
+## 0.1.1 — 2026-04-25
+
+### Changed
+- `POST /api/auth/telegram`: documented `auth_date` freshness window as 24 hours (was incorrectly 1 hour). Matches actual backend behaviour.
+- `Set-Cookie` header response on `POST /api/auth/telegram`: added `Max-Age=604800` (7-day session lifetime) to example and description.
+
 ## 0.1.0 — 2026-04-25
 
 Initial HTTP API surface for the web vertical slice.

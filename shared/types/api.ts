@@ -142,7 +142,7 @@ export interface components {
             /** @description Per-category totals, ordered by total descending. */
             categories: components["schemas"]["CategorySum"][];
         };
-        /** @description Fields forwarded from the Telegram Login Widget callback. The `hash` field is an HMAC-SHA256 of the sorted field list signed with the bot token; the backend MUST verify it and reject payloads where `auth_date` is older than 1 hour. */
+        /** @description Fields forwarded from the Telegram Login Widget callback. The `hash` field is an HMAC-SHA256 of the sorted field list signed with the bot token; the backend MUST verify it and reject payloads where `auth_date` is older than 24 hours. */
         TelegramAuthPayload: {
             /**
              * Format: int64
@@ -208,7 +208,7 @@ export interface operations {
             /** @description Authentication successful. Session cookie is set. */
             200: {
                 headers: {
-                    /** @description `session=<jwt>; HttpOnly; Secure; SameSite=Lax; Path=/` */
+                    /** @description Sets a `session` cookie containing the signed JWT. Lifetime: 7 days (`Max-Age=604800`). */
                     "Set-Cookie": string;
                     [name: string]: unknown;
                 };

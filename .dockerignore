@@ -1,0 +1,51 @@
+# .dockerignore — monorepo root (build context for PaymentChecker-backend/Dockerfile)
+#
+# Goal: keep the build context small and avoid copying artifacts that the
+# Dockerfile recreates explicitly (node_modules, .next, frontend out/).
+
+# Version-control metadata
+**/.git
+
+# Editor / IDE config
+.idea
+.vscode
+.claude
+
+# Environment files that must never enter the image
+**/.env
+**/.env.local
+**/.env.*.local
+
+# Node artefacts — installed inside the container during the frontend-builder stage.
+**/node_modules
+
+# Next.js build cache and previous export — the frontend-builder stage produces
+# a fresh export; letting old ones into the context would waste bandwidth and
+# could shadow the real build.
+**/.next
+**/out
+
+# The stub web/out used for local Go builds must NOT shadow the real frontend
+# export that the Dockerfile copies from the frontend-builder stage.
+PaymentChecker-backend/internal/webfs/web/out/*
+
+# SQLite database files (runtime data, not source)
+PaymentChecker-backend/spendings.db
+PaymentChecker-backend/*.db
+*.db
+
+# Wiki and generated docs (not needed at build time)
+shared/PaymentCheckerWiki
+
+# Explicitly exclude frontend node_modules and build output in case the
+# double-star glob above is not matched by older BuildKit versions.
+PaymentChecker-frontend/node_modules
+PaymentChecker-frontend/out
+PaymentChecker-frontend/.next
+
+# Mobile app — unrelated to this build
+PaymentChecker-mobile
+
+# Root-level docs/config not needed inside the image
+README.md
+CLAUDE.md

@@ -25,6 +25,17 @@ A task is **complex** if it meets one or more of these criteria:
 
 **If simple** (single-package, clear scope, no design decisions — or any task explicitly exempted by an exception in the criteria above): skip step 1 (architector) and proceed with steps 2–7 of the delegation order as applicable. State why it qualifies as simple. The review cycle and wiki update still apply.
 
+## Step 0.5 — Wiki context lookup (always, after complexity verdict)
+
+Before delegating to any specialist agent, consult the wiki:
+
+1. Read `shared/PaymentCheckerWiki/index.md`
+2. Identify the pages whose summaries match the task domain — e.g. a backend storage change → `[[storage]]`, `[[schema]]`; a new feature → its feature page if it exists; an ADR-relevant decision → related ADR pages. Typically 1–3 pages, rarely more than 5.
+3. Read each relevant page.
+4. Include a **"Wiki context"** block in every specialist agent prompt with the key facts pulled from those pages — a short bullet list, under 150 words. Synthesize only what's relevant to the task; do not dump raw page content.
+
+Skip this step only if the wiki index has no pages that match the task domain.
+
 ## Delegation order
 
 1. **architector** — planning (complex tasks only)
@@ -66,6 +77,7 @@ Do not skip this cycle even when the task seems small or low-risk.
 Before sending your final response to the user, confirm every applicable item is done:
 
 - [ ] **Step 0:** Complexity verdict stated explicitly
+- [ ] **Step 0.5:** Wiki index read, relevant pages fetched, wiki context block included in each specialist agent prompt
 - [ ] **Architector invoked** (if complex), plan presented to user, and user explicitly approved before delegation
 - [ ] **shared-agent** ran first (if API contracts changed)
 - [ ] **reviewer-agent** reviewed shared/ changes and returned a clean pass (if shared-agent made contract changes)

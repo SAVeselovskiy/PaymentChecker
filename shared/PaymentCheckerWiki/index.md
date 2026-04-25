@@ -1,6 +1,6 @@
 ---
 title: Wiki Index
-updated: 2026-04-21
+updated: 2026-04-25
 ---
 
 # PaymentChecker Wiki — Index
@@ -26,6 +26,10 @@ Catalog of all pages, organized by category. One-line summary per page.
 | [[parsing]] | Regex-based input parsers for spending amounts and free-text format |
 | [[storage]] | SQLite storage layer — Store struct, CRUD operations, query patterns |
 | [[scheduler]] | Background weekly report scheduler — Monday 09:00 push logic |
+
+**New packages (web vertical slice):**
+- `internal/http/` — HTTP server, `ServeMux` routes, JWT middleware, auth handlers
+- `internal/webfs/` — `//go:embed web/out` FS; SPA fallback handler serving the Next.js static export
 
 ## Features
 
@@ -57,6 +61,8 @@ Catalog of all pages, organized by category. One-line summary per page.
 | [[adr-001-sqlite]] | ADR-001: SQLite chosen as the database — rationale and trade-offs |
 | [[adr-002-pure-go]] | ADR-002: Pure-Go SQLite driver (no CGO) — portability rationale |
 | [[adr-003-long-polling]] | ADR-003: Long polling over webhooks — simplicity for self-hosted deploy |
+| [[adr-004-http-api-and-telegram-login]] | ADR-004: HTTP API surface and Telegram Login Widget auth (JWT cookie) |
+| [[adr-005-static-export-embedded-in-go]] | ADR-005: Next.js static export embedded in Go binary — single-binary deploy |
 
 ## Roadmap
 
