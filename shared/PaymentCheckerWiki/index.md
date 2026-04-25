@@ -15,7 +15,8 @@ Catalog of all pages, organized by category. One-line summary per page.
 |------|---------|
 | [[overview]] | High-level system design: what PaymentsChecker is and how its parts fit together |
 | [[monorepo-structure]] | Monorepo layout — packages, git submodule setup, shared layer |
-| [[agent-system]] | Claude agent orchestration — roles, delegation rules, execution order |
+| [[agent-system]] | Roster of Claude subagents — scopes, delegation rules, execution order |
+| [[orchestration-playbook]] | Step-by-step procedure the main thread follows to coordinate subagents |
 
 ## Backend
 
