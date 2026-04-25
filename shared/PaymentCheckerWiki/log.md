@@ -23,6 +23,18 @@ Append-only chronological record of all wiki operations.
 
 ---
 
+## LOG 2026-04-25 — Web slice smoke test: env propagation + SPA routing
+**Participants:** user, Claude (main thread), backend-agent (via main thread), shared-agent
+**Context:** Smoke-testing the deployed Docker image after the vertical-slice ship; the Telegram widget didn't render and `/login/` served the dashboard.
+**Decision:** Two fixes:
+- Pass `NEXT_PUBLIC_*` Next.js build vars via `docker build --build-arg` and materialise them into `.env.production` before `pnpm build` (commits 2629fc9, d3168f8).
+- Trim both leading AND trailing slashes before `fs.Stat` in the SPA fallback; accept directory paths whose `<path>/index.html` exists (commit 9885277).
+**Rationale:** Next.js inlines `NEXT_PUBLIC_*` at build time, not runtime — `ENV` in the Dockerfile alone is fragile; `.env.production` is Next.js's deterministic env source. Go's `fs.FS` rejects trailing slashes as invalid paths, which silently broke every directory route in a `trailingSlash: true` static export.
+**Wiki:** [[adr-005-static-export-embedded-in-go]] (amended with the SPA-routing + env-baking gotchas).
+**Commits:** backend 2629fc9, d3168f8, 9885277.
+
+---
+
 ## INGEST 2026-04-21 — Initial wiki creation
 
 - Source: codebase exploration of `/home/sergey/Projects/PaymentsChecker`

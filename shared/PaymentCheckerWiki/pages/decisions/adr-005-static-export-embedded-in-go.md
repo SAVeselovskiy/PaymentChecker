@@ -54,6 +54,47 @@ These limitations are acceptable for the current feature set (dashboard + login 
 
 **Frontend development is unaffected:** `pnpm dev` runs on `:3000` with `next.config.ts` rewrites proxying `/api/*` to the backend on `:8080`. Static export is only used at build time.
 
+## Implementation Gotchas
+
+### `NEXT_PUBLIC_*` vars must be baked in at build time
+
+Next.js inlines every `NEXT_PUBLIC_*` environment variable directly into the client bundle during `next build`. Passing them at runtime (e.g. `docker run -e NEXT_PUBLIC_TELEGRAM_BOT_NAME=…`) has no effect on an already-built bundle.
+
+Setting `ENV` in the Dockerfile is also unreliable for Next.js's env loader because the value must be present when `pnpm build` runs and must be in a source Next.js treats as authoritative.
+
+**Adopted solution:** the Dockerfile accepts a build argument and writes it to `.env.production` immediately before invoking `pnpm build`:
+
+```dockerfile
+ARG NEXT_PUBLIC_TELEGRAM_BOT_NAME
+RUN echo "NEXT_PUBLIC_TELEGRAM_BOT_NAME=${NEXT_PUBLIC_TELEGRAM_BOT_NAME}" \
+    > PaymentChecker-frontend/.env.production
+RUN pnpm --filter @paymentchecker/web build
+```
+
+Build invocation:
+
+```bash
+docker build \
+  --build-arg NEXT_PUBLIC_TELEGRAM_BOT_NAME=YourBot \
+  -t paymentchecker:slice \
+  -f PaymentChecker-backend/Dockerfile .
+```
+
+Commits: `2629fc9` (build-arg plumbing), `d3168f8` (`.env.production` materialisation).
+
+### SPA fallback must handle directory-style paths
+
+With `trailingSlash: true` in `next.config.ts`, Next.js emits every route as `<route>/index.html` rather than `<route>.html`. This means the Go static handler receives URLs like `/login/` and `/dashboard/`.
+
+The naive approach — `fs.Stat(webFS, strings.TrimPrefix(req.URL.Path, "/"))` — silently fails for these URLs: Go's `fs.FS` contract rejects paths with trailing slashes as invalid, so `fs.Stat` errors, the handler falls through to the SPA entry point, and `/index.html` (the authenticated dashboard) is served for every unrecognised directory route including `/login/`.
+
+**Fix (commit `9885277`):** trim both leading and trailing slashes before probing, then accept the path if either:
+
+1. The exact trimmed entry exists in the embedded FS, or
+2. `<trimmed-path>/index.html` exists (covering all `trailingSlash: true` directory routes).
+
+Only if both probes fail does the handler fall back to the root `index.html`.
+
 ## Alternatives Considered
 
 **Vite SPA** — strictly leaner bundle and simpler config, but would lose Next.js App Router conventions, the `@next/eslint-plugin-next` lint rules, and the Tailwind/TypeScript integration that the project was initialized with. Not worth the migration cost.
