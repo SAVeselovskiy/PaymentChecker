@@ -13,6 +13,13 @@ You work exclusively inside the `backend/` subfolder and may read (but not modif
 
 - **Godoc:** Every new exported type, function, method, interface, and package must have a Godoc comment. When you modify a key functionality (behaviour change, new parameter, changed return value, renamed concept), update any existing Godoc comment on that symbol to stay accurate. "Key functionality" means exported identifiers and package-level declarations — unexported helpers do not require Godoc unless their logic is non-obvious.
 
+- **`fs.FS` path handling (HTTP static / SPA fallback handlers):** Go's `fs.FS` rejects paths with a leading `/`, a trailing `/`, or any `.` / `..` segment as invalid — `fs.Stat` and `fs.Open` return an error silently in those cases. URL paths almost always have at least a leading `/` and frequently a trailing `/` (e.g. `/login/`, `/dashboard/`). When probing the embedded FS for an HTTP request path:
+  1. Use `strings.Trim(req.URL.Path, "/")` — NOT `strings.TrimPrefix(..., "/")`. The trailing slash matters.
+  2. For directory-style routes (any static-export framework with `trailingSlash: true`, including Next.js `output: 'export'`), accept the path if either the exact entry exists OR `<probe>+"/index.html"` exists.
+  3. Add a regression test that exercises a directory-style route (e.g. `GET /login/`) and asserts the response body matches the expected page, not the SPA root entry point. Without this test, every page silently falls back to `index.html` and the bug only surfaces in browser smoke testing.
+
+  See `[[adr-005-static-export-embedded-in-go]]` Implementation Gotchas for the original incident.
+
 ## Constraints
 
 - Only read/write files under `backend/` or `shared/` (read-only).
