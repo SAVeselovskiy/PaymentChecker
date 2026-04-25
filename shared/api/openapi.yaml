@@ -1,0 +1,276 @@
+openapi: 3.1.0
+
+info:
+  title: PaymentChecker API
+  version: 0.1.0
+  description: >
+    HTTP API for the PaymentChecker web and mobile clients.
+    Authentication uses the Telegram Login Widget flow; sessions are
+    maintained via an HttpOnly cookie named `session`.
+
+servers:
+  - url: /
+    description: Same-origin (served by backend)
+
+# ---------------------------------------------------------------------------
+# Security
+# ---------------------------------------------------------------------------
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: session
+
+  # -------------------------------------------------------------------------
+  # Schemas
+  # -------------------------------------------------------------------------
+  schemas:
+
+    User:
+      type: object
+      description: An authenticated PaymentChecker user (sourced from Telegram identity).
+      required:
+        - id
+        - first_name
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Telegram user ID.
+          examples:
+            - 123456789
+        first_name:
+          type: string
+          description: User's first name as provided by Telegram.
+          examples:
+            - Alice
+        last_name:
+          type: string
+          description: User's last name (optional).
+          examples:
+            - Smith
+        username:
+          type: string
+          description: Telegram @username without the leading "@" (optional).
+          examples:
+            - alice_smith
+        photo_url:
+          type: string
+          description: URL of the user's Telegram profile photo (optional).
+          examples:
+            - https://t.me/i/userpic/320/alice.jpg
+
+    CategorySum:
+      type: object
+      description: Aggregated spending total for a single category.
+      required:
+        - category
+        - total
+      properties:
+        category:
+          type: string
+          description: Free-text category name as stored by the user.
+          examples:
+            - Food
+        total:
+          type: number
+          format: double
+          description: Sum of spending amounts for this category (unitless).
+          examples:
+            - 2340.5
+
+    TodayBreakdown:
+      type: object
+      description: >
+        Spending breakdown for the current calendar day, computed in the
+        server's configured timezone (TZ env var).
+      required:
+        - total
+        - categories
+      properties:
+        total:
+          type: number
+          format: double
+          description: Grand total across all categories for today.
+          examples:
+            - 3410.0
+        categories:
+          type: array
+          description: Per-category totals, ordered by total descending.
+          items:
+            $ref: '#/components/schemas/CategorySum'
+
+    TelegramAuthPayload:
+      type: object
+      description: >
+        Fields forwarded from the Telegram Login Widget callback.
+        The `hash` field is an HMAC-SHA256 of the sorted field list signed
+        with the bot token; the backend MUST verify it and reject payloads
+        where `auth_date` is older than 1 hour.
+      required:
+        - id
+        - first_name
+        - auth_date
+        - hash
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Telegram user ID.
+          examples:
+            - 123456789
+        first_name:
+          type: string
+          examples:
+            - Alice
+        last_name:
+          type: string
+          examples:
+            - Smith
+        username:
+          type: string
+          examples:
+            - alice_smith
+        photo_url:
+          type: string
+          examples:
+            - https://t.me/i/userpic/320/alice.jpg
+        auth_date:
+          type: integer
+          format: int64
+          description: Unix timestamp (seconds) of when the user authorized the widget.
+          examples:
+            - 1745539200
+        hash:
+          type: string
+          description: HMAC-SHA256 verification hash produced by Telegram.
+          examples:
+            - a1b2c3d4e5f6...
+
+    Error:
+      type: object
+      description: Standard error envelope.
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code.
+          examples:
+            - INVALID_HASH
+        message:
+          type: string
+          description: Human-readable error description.
+          examples:
+            - Telegram auth hash is invalid or expired.
+
+# ---------------------------------------------------------------------------
+# Paths
+# ---------------------------------------------------------------------------
+paths:
+
+  /api/auth/telegram:
+    post:
+      operationId: telegramAuth
+      summary: Authenticate via Telegram Login Widget
+      description: >
+        Validates the Telegram Login Widget payload (HMAC-SHA256 + freshness
+        check on `auth_date`). On success, issues a session JWT as an HttpOnly
+        cookie and returns the resolved `User` object.
+      security: []
+      tags:
+        - auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TelegramAuthPayload'
+      responses:
+        '200':
+          description: Authentication successful. Session cookie is set.
+          headers:
+            Set-Cookie:
+              required: true
+              description: >
+                `session=<jwt>; HttpOnly; Secure; SameSite=Lax; Path=/`
+              schema:
+                type: string
+                examples:
+                  - session=eyJ...; HttpOnly; Secure; SameSite=Lax; Path=/
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Invalid HMAC signature or stale `auth_date`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/auth/logout:
+    post:
+      operationId: logout
+      summary: Invalidate the current session
+      description: >
+        Idempotent — clears the session cookie if present, returns 204 regardless
+        of authentication state. No 401 is returned.
+      security: []
+      tags:
+        - auth
+      responses:
+        '204':
+          description: Session cleared. Cookie is expired.
+
+  /api/me:
+    get:
+      operationId: getMe
+      summary: Get the authenticated user
+      description: Returns the currently logged-in user identified by the session cookie.
+      security:
+        - cookieAuth: []
+      tags:
+        - users
+      responses:
+        '200':
+          description: The authenticated user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Missing or invalid session cookie.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/spendings/today:
+    get:
+      operationId: getTodayBreakdown
+      summary: Get today's spending breakdown
+      description: >
+        Returns the grand total and per-category breakdown for the current
+        calendar day. "Today" is computed using the server's configured
+        timezone (TZ env var) to match the Telegram bot's `/today` command.
+        Categories are ordered by total descending.
+      security:
+        - cookieAuth: []
+      tags:
+        - spendings
+      responses:
+        '200':
+          description: Today's breakdown.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TodayBreakdown'
+        '401':
+          description: Missing or invalid session cookie.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'

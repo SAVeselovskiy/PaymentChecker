@@ -1,0 +1,8 @@
+# Redocly configuration for PaymentChecker API linting.
+# https://redocly.com/docs/cli/configuration/
+#
+# Per-operation rule suppressions are managed in .redocly.lint-ignore.yaml,
+# which scopes each suppression to the exact JSON Pointer where it applies.
+
+extends:
+  - recommended

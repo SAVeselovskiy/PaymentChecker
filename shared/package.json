@@ -1,0 +1,6 @@
+{
+  "name": "@paymentchecker/workspace",
+  "version": "0.0.0",
+  "private": true,
+  "packageManager": "pnpm@10.33.2"
+}

@@ -34,3 +34,6 @@ go.work.sum
 # Local data
 *.db
 data/
+
+# Node
+node_modules/

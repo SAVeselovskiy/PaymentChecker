@@ -1,0 +1,13 @@
+{
+  "name": "@paymentchecker/types",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./api.ts",
+  "types": "./api.ts",
+  "scripts": {
+    "gen": "openapi-typescript ../api/openapi.yaml -o ./api.ts"
+  },
+  "devDependencies": {
+    "openapi-typescript": "^7.4.0"
+  }
+}
