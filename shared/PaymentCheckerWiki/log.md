@@ -35,6 +35,15 @@ Append-only chronological record of all wiki operations.
 
 ---
 
+## LOG 2026-04-25 — Telegram auth UX options discussed
+**Participants:** user, shared-agent
+**Context:** Evaluating alternatives to the Telegram Login Widget to eliminate the third-party popup UX issue.
+**Decision:** Deferred roadmap entry created for Option A (bot deep-link magic-token flow) as the recommended replacement; Option B (Mini App) noted as a future complement; Option C (keep Widget) is the do-nothing default.
+**Rationale:** The deep-link flow hands off to the installed Telegram app, removes the third-party iframe, and eliminates the silent failure modes documented in ADR-005.
+**Wiki:** [[telegram-auth-ux]] (created), [[roadmap-overview]] (updated), [[index.md]] (updated)
+
+---
+
 ## INGEST 2026-04-21 — Initial wiki creation
 
 - Source: codebase exploration of `/home/sergey/Projects/PaymentsChecker`

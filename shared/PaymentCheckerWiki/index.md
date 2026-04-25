@@ -70,3 +70,4 @@ Catalog of all pages, organized by category. One-line summary per page.
 | Page | Summary |
 |------|---------|
 | [[roadmap-overview]] | Planned work: website, mobile app, HTTP API, shared contracts |
+| [[telegram-auth-ux]] | Roadmap: replace Login Widget with bot deep-link flow for native Telegram app handoff |

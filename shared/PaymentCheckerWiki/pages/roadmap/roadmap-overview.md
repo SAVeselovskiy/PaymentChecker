@@ -2,7 +2,7 @@
 title: Roadmap Overview
 category: roadmap
 tags: [roadmap, planned, website, mobile, api]
-related: [[overview]], [[monorepo-structure]], [[agent-system]], [[adr-004-http-api-and-telegram-login]], [[adr-005-static-export-embedded-in-go]]
+related: [[overview]], [[monorepo-structure]], [[agent-system]], [[adr-004-http-api-and-telegram-login]], [[adr-005-static-export-embedded-in-go]], [[telegram-auth-ux]]
 updated: 2026-04-25
 ---
 
@@ -44,6 +44,13 @@ The contract lives in `shared/api/` and is versioned; downstream packages consum
   - `/` — today's spending breakdown by category (bar chart + list)
 - Auth: client-side `<AuthGate>` component checks `/api/me`; unauthenticated users are redirected to `/login`
 - Future: history view, week/month/year charts, settings page, add-spending UI
+
+### Auth UX — Telegram app handoff
+
+The website currently uses the Telegram Login Widget. The roadmap is to replace it with a bot deep-link flow that hands off to the installed Telegram app, avoiding the third-party phone-entry popup.
+
+> [!note] Not yet started — deferred
+> See [[telegram-auth-ux]] for options, recommendation, and implementation outline.
 
 ### 3. Mobile App (`PaymentChecker-mobile/`)
 
