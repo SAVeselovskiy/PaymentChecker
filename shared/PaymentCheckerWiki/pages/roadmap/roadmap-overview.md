@@ -1,9 +1,9 @@
 ---
 title: Roadmap Overview
 category: roadmap
-tags: [roadmap, planned, website, mobile, api]
-related: [[overview]], [[monorepo-structure]], [[agent-system]], [[adr-004-http-api-and-telegram-login]], [[adr-005-static-export-embedded-in-go]], [[telegram-auth-ux]]
-updated: 2026-04-25
+tags: [roadmap, planned, website, mobile, api, deployment]
+related: [[overview]], [[monorepo-structure]], [[agent-system]], [[adr-004-http-api-and-telegram-login]], [[adr-005-static-export-embedded-in-go]], [[telegram-auth-ux]], [[frontend-standalone-deploy]]
+updated: 2026-04-26
 ---
 
 # Roadmap Overview
@@ -35,15 +35,22 @@ The contract lives in `shared/api/` and is versioned; downstream packages consum
 
 ### 2. Website (`PaymentChecker-frontend/`)
 
-**Status: Vertical slice shipped.**
+**Status: Vertical slice shipped, but not production-ready. Deployment decoupled from the backend.**
 
 - Stack: Next.js 15 App Router + TypeScript + Tailwind CSS + Recharts + TanStack Query
-- Deploy model: `output: 'export'` static build, embedded in the Go binary via `//go:embed` (see [[adr-005-static-export-embedded-in-go]])
 - Shipped pages:
   - `/login` — Telegram Login Widget, redirects to `/` on success
   - `/` — today's spending breakdown by category (bar chart + list)
 - Auth: client-side `<AuthGate>` component checks `/api/me`; unauthenticated users are redirected to `/login`
 - Future: history view, week/month/year charts, settings page, add-spending UI
+
+> [!warning] Deploy model superseded
+> [[adr-005-static-export-embedded-in-go]] originally embedded the Next.js
+> static export inside the Go binary. As of 2026-04-26 the backend Docker
+> image ships with a placeholder page only and the frontend is deployed
+> independently — see [[frontend-standalone-deploy]]. ADR-005 is kept for
+> historical context; a follow-up ADR will record the new deploy model
+> once the standalone frontend image lands.
 
 ### Auth UX — Telegram app handoff
 

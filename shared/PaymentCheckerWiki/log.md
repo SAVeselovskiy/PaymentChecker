@@ -35,6 +35,20 @@ Append-only chronological record of all wiki operations.
 
 ---
 
+## LOG 2026-04-26 — Backend deploy decoupled from frontend
+**Participants:** user, Claude (main thread)
+**Context:** Frontend isn't production-ready, but the Telegram bot is. VPS deploy was failing because the backend Dockerfile pulled `PaymentChecker-frontend/` and `shared/` from the monorepo root, which didn't exist on the VPS. We also hit two latent bugs in `build.sh` while debugging — silent exits caused by `set -euo pipefail` interacting with `grep` returning no match in `read_env_var`, and a broken JWT_SECRET write path when the `.env` line was missing.
+**Decision:**
+- Backend Docker build context narrowed to `PaymentChecker-backend/` only. Dropped the `frontend-builder` stage; the embedded `internal/webfs/web/out/` ships only a placeholder `index.html`.
+- `docker-compose.yml` no longer references sibling repos and no longer takes `NEXT_PUBLIC_TELEGRAM_BOT_NAME` build arg. `.env.example` and `build.sh` trimmed accordingly.
+- `build.sh`: wrapped the `read_env_var` grep in `{ ... || true; }` so a missing line is "empty value" rather than a pipefail-induced silent exit; the JWT_SECRET auto-generate branch now appends the line when absent instead of silently no-op'ing through `sed`.
+- Standalone frontend deploy added to the roadmap — see [[frontend-standalone-deploy]].
+**Rationale:** Unblocks shipping the bot without waiting on the web UI; clean separation aligns with future hosting flexibility (separate container, Vercel, CDN). The `build.sh` fixes were already manifesting as "no output, script exits silently" failures during the VPS bring-up.
+**Wiki:** [[frontend-standalone-deploy]] (created), [[roadmap-overview]] (updated — supersedes-callout on ADR-005 deploy model), [[index.md]] (updated). [[adr-005-static-export-embedded-in-go]] left as historical until a successor ADR is written.
+**Commits:** backend `dd416f4` (build.sh pipefail/JWT_SECRET fixes); follow-up commit pending for the Dockerfile/compose split.
+
+---
+
 ## LOG 2026-04-25 — Telegram auth UX options discussed
 **Participants:** user, shared-agent
 **Context:** Evaluating alternatives to the Telegram Login Widget to eliminate the third-party popup UX issue.

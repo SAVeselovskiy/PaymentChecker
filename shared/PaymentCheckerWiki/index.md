@@ -1,6 +1,6 @@
 ---
 title: Wiki Index
-updated: 2026-04-25
+updated: 2026-04-26
 ---
 
 # PaymentChecker Wiki — Index
@@ -71,3 +71,4 @@ Catalog of all pages, organized by category. One-line summary per page.
 |------|---------|
 | [[roadmap-overview]] | Planned work: website, mobile app, HTTP API, shared contracts |
 | [[telegram-auth-ux]] | Roadmap: replace Login Widget with bot deep-link flow for native Telegram app handoff |
+| [[frontend-standalone-deploy]] | Roadmap: ship the Next.js web UI as its own image, decouple it from the backend deploy |
