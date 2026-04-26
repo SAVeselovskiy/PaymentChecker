@@ -35,6 +35,17 @@ Append-only chronological record of all wiki operations.
 
 ---
 
+## LOG 2026-04-26 — Production DB lost during VPS migration; backups roadmapped
+**Participants:** user, Claude (main thread)
+**Context:** During the standalone-backend rollout (see prior log entry), the new container hit `SQLITE_CANTOPEN` and then `SQLITE_READONLY_DIRECTORY` because the docker named volume `/data` was root-owned. While diagnosing, the user pointed at `PaymentChecker-backend/spendings.db` on the host as the "old DB". We copied that file into the volume — but it turned out to be a stale test DB from an early bare-binary run. The real production DB had always lived inside the named volume (`DB_PATH=/data/spendings.db` since the initial commit), and the copy overwrote it. No backup existed.
+**Decision:**
+- Accept the data loss for this deploy ("sacrifice old db for this time only").
+- Add database backups as a roadmap item: v1 local rotation via `sqlite3 .backup` on a cron, v2 off-box copy to S3-compatible storage. Pre-deploy snapshot inside `build.sh` to land alongside v1 so a bad migration is recoverable.
+**Rationale:** Single-VPS philosophy still applies — backups should be cheap and operable without extra paid services. The incident proved that even minor migrations can wipe data when there's nothing to fall back to.
+**Wiki:** [[database-backups]] (created), [[roadmap-overview]] (added Operations section + tag), [[index.md]] (registered new page).
+
+---
+
 ## LOG 2026-04-26 — Backend deploy decoupled from frontend
 **Participants:** user, Claude (main thread)
 **Context:** Frontend isn't production-ready, but the Telegram bot is. VPS deploy was failing because the backend Dockerfile pulled `PaymentChecker-frontend/` and `shared/` from the monorepo root, which didn't exist on the VPS. We also hit two latent bugs in `build.sh` while debugging — silent exits caused by `set -euo pipefail` interacting with `grep` returning no match in `read_env_var`, and a broken JWT_SECRET write path when the `.env` line was missing.

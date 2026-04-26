@@ -1,8 +1,8 @@
 ---
 title: Roadmap Overview
 category: roadmap
-tags: [roadmap, planned, website, mobile, api, deployment]
-related: [[overview]], [[monorepo-structure]], [[agent-system]], [[adr-004-http-api-and-telegram-login]], [[adr-005-static-export-embedded-in-go]], [[telegram-auth-ux]], [[frontend-standalone-deploy]]
+tags: [roadmap, planned, website, mobile, api, deployment, ops]
+related: [[overview]], [[monorepo-structure]], [[agent-system]], [[adr-004-http-api-and-telegram-login]], [[adr-005-static-export-embedded-in-go]], [[telegram-auth-ux]], [[frontend-standalone-deploy]], [[database-backups]]
 updated: 2026-04-26
 ---
 
@@ -69,7 +69,17 @@ The website currently uses the Telegram Login Widget. The roadmap is to replace 
 > [!note] Not yet started
 > No mobile design or implementation work has been done.
 
-### 4. Shared Contracts (`shared/`)
+### 4. Operations — Database Backups
+
+**Status: Not yet implemented. Tracked in [[database-backups]].**
+
+No automated backup mechanism exists for `spendings.db`. On 2026-04-26 the
+production DB was lost during the VPS migration to the standalone-backend
+deploy. Plan: daily on-host `sqlite3 .backup` rotation (v1), then off-box
+copy to S3-compatible storage (v2). Pre-deploy snapshot in `build.sh`
+should land alongside v1 so a bad migration is recoverable.
+
+### 5. Shared Contracts (`shared/`)
 
 - `shared/api/openapi.yaml` — OpenAPI 3.1 spec (current: v0.1.1)
 - `shared/types/api.ts` — TypeScript types, generated from the spec
